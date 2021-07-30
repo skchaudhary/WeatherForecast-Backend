@@ -1,4 +1,4 @@
-package com.weather.forecast.services;
+package com.weather.forecast.services.impl;
 
 import com.weather.forecast.models.Customer;
 import com.weather.forecast.repository.UserRepository;
@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service("customUserService")

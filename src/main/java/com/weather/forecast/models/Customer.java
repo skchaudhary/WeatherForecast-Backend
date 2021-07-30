@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "user")
 public class Customer {
     @Id
-    private Object id;
+    private Object _id;
     private String firstName;
     private String lastName;
     private String email;
@@ -19,12 +19,12 @@ public class Customer {
         this.password = password;
     }
 
-    public Object getId() {
-        return id;
+    public Object get_id() {
+        return _id;
     }
 
-    public void setId(Object id) {
-        this.id = id;
+    public void set_id(Object _id) {
+        this._id = _id;
     }
 
     public String getFirstName() {
@@ -62,7 +62,7 @@ public class Customer {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id=" + _id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
