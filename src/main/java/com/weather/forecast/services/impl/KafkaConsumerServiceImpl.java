@@ -12,7 +12,7 @@ public class KafkaConsumerServiceImpl implements KafkaConsumerService{
     private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerServiceImpl.class);
 
     @Override
-    @KafkaListener(topics = {"'#{${app.kafka.consumer.topic}}'"})
+    @KafkaListener(topics = {"#{'${app.kafka.consumer.topic}'.split(',')}"})
     public void consume(ConsumerRecord<String, String> consumerRecord) {
         logger.info("message received: {}", consumerRecord);
     }

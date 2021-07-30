@@ -18,7 +18,7 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    @Value("${app.kafka.producer.topic}")
+    @Value("${app.kafka.producer.topic-current}")
     private String topic;
 
     @Override

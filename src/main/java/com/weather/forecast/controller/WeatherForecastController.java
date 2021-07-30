@@ -2,6 +2,7 @@ package com.weather.forecast.controller;
 
 import com.weather.forecast.services.KafkaConsumerService;
 import com.weather.forecast.services.KafkaProducerService;
+import com.weather.forecast.services.WeatherForecastProcessService;
 import com.weather.forecast.utils.WeatherProcessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,9 @@ public class WeatherForecastController {
     @Autowired
     private KafkaProducerService kafkaProducerService;
 
+    @Autowired
+    private WeatherForecastProcessService weatherForecastProcessService;
+
     /**
      * forecast current day weather data
      *
@@ -47,8 +51,8 @@ public class WeatherForecastController {
      *
      * @return
      */
-    @GetMapping("/future")
-    public String forecastFutureWeather() throws IOException {
+    @GetMapping("/future/{cityName}")
+    public String forecastFutureWeather(@PathVariable String cityName) throws IOException {
         return WeatherProcessUtil.getWeatherResponse(futureWeatherUrl);
     }
 
@@ -57,8 +61,8 @@ public class WeatherForecastController {
      *
      * @return
      */
-    @GetMapping("/past")
-    public String forecastPastWeather() throws IOException {
+    @GetMapping("/past/{latitude}/{longitude}")
+    public String forecastPastWeather(@PathVariable Double latitude, @PathVariable Double longitude) throws IOException {
         return WeatherProcessUtil.getWeatherResponse(pastWeatherUrl);
     }
 }

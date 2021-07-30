@@ -1,12 +1,14 @@
 package com.weather.forecast.models;
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "user")
 public class Customer {
+    @BsonIgnore
     @Id
-    private Object _id;
+    private Object id;
     private String firstName;
     private String lastName;
     private String email;
@@ -19,12 +21,12 @@ public class Customer {
         this.password = password;
     }
 
-    public Object get_id() {
-        return _id;
+    public Object getId() {
+        return id;
     }
 
-    public void set_id(Object _id) {
-        this._id = _id;
+    public void setId(Object id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -62,7 +64,7 @@ public class Customer {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + _id +
+                "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
