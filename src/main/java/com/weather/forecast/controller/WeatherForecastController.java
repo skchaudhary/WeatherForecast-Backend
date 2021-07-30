@@ -28,9 +28,6 @@ public class WeatherForecastController {
     @Autowired
     private KafkaProducerService kafkaProducerService;
 
-    @Autowired
-    private KafkaConsumerService kafkaConsumerService;
-
     /**
      * forecast current day weather data
      *
