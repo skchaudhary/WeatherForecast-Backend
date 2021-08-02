@@ -1,5 +1,9 @@
 package com.weather.forecast.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.prominence.openweathermap.api.model.forecast.Forecast;
+import com.github.prominence.openweathermap.api.model.onecall.historical.HistoricalWeatherData;
+import com.github.prominence.openweathermap.api.model.weather.Weather;
 import com.weather.forecast.services.KafkaConsumerService;
 import com.weather.forecast.services.KafkaProducerService;
 import com.weather.forecast.services.WeatherForecastProcessService;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/weather/forecast")
@@ -27,10 +32,10 @@ public class WeatherForecastController {
     private String futureWeatherUrl;
 
     @Autowired
-    private KafkaProducerService kafkaProducerService;
+    private WeatherForecastProcessService weatherForecastProcessService;
 
     @Autowired
-    private WeatherForecastProcessService weatherForecastProcessService;
+    private ObjectMapper objectMapper;
 
     /**
      * forecast current day weather data
@@ -39,11 +44,16 @@ public class WeatherForecastController {
      */
     @GetMapping("/current/{cityName}")
     public String currentWeather(@PathVariable String cityName) throws IOException {
-        currentWeatherUrl = String.format(currentWeatherUrl, cityName);
-        String data = WeatherProcessUtil.getWeatherResponse(currentWeatherUrl);
-        kafkaProducerService.produce(data);
+//        currentWeatherUrl = String.format(currentWeatherUrl, cityName);
+//        String data = WeatherProcessUtil.getWeatherResponse(currentWeatherUrl);
+//        kafkaProducerService.produce(data);
 
-        return data;
+        Optional<Weather> currentForecastedData = weatherForecastProcessService.getCurrentWeatherForecast(cityName);
+        if (currentForecastedData.isPresent()) {
+            return objectMapper.writeValueAsString(currentForecastedData.get());
+        } else {
+            return new String();
+        }
     }
 
     /**
@@ -53,7 +63,12 @@ public class WeatherForecastController {
      */
     @GetMapping("/future/{cityName}")
     public String forecastFutureWeather(@PathVariable String cityName) throws IOException {
-        return WeatherProcessUtil.getWeatherResponse(futureWeatherUrl);
+        Optional<Forecast> currentForecastedData = weatherForecastProcessService.getFutureWeatherForecast(cityName);
+        if (currentForecastedData.isPresent()) {
+            return objectMapper.writeValueAsString(currentForecastedData.get());
+        } else {
+            return new String();
+        }
     }
 
     /**
@@ -63,6 +78,11 @@ public class WeatherForecastController {
      */
     @GetMapping("/past/{latitude}/{longitude}")
     public String forecastPastWeather(@PathVariable Double latitude, @PathVariable Double longitude) throws IOException {
-        return WeatherProcessUtil.getWeatherResponse(pastWeatherUrl);
+        Optional<HistoricalWeatherData> currentForecastedData = weatherForecastProcessService.getPastWeatherForecast(latitude, longitude);
+        if (currentForecastedData.isPresent()) {
+            return objectMapper.writeValueAsString(currentForecastedData.get());
+        } else {
+            return new String();
+        }
     }
 }

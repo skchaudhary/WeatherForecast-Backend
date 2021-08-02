@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface WeatherForecastProcessService {
     Optional<Weather> getCurrentWeatherForecast(String city);
-    Optional<HistoricalWeatherData> getPastWeatherForecast(Double lon, Double lat);
+    Optional<HistoricalWeatherData> getPastWeatherForecast(Double latitude, Double longitude);
     Optional<Forecast> getFutureWeatherForecast(String city);
 }

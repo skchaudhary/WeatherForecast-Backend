@@ -18,11 +18,8 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    @Value("${app.kafka.producer.topic-current}")
-    private String topic;
-
     @Override
-    public void produce(String message) {
+    public void produce(String message, String topic) {
         log.info("message before sent: {}", message);
         ProducerRecord<String, String> producerRecord = buildProducerRecord(topic, message);
         ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(producerRecord);
