@@ -1,27 +1,46 @@
 package com.weather.forecast.models;
 
 
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.prominence.openweathermap.api.enums.WeatherCondition;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 @Document(collection = "weather")
 @NoArgsConstructor
 @Data
 public class WeatherModel {
-    @BsonIgnore
     @Id
-    private Object id;
+    @Field("_id")
+    @JsonIgnore
+    private String id;
     private String key;
     private WeatherType type;
-    private String data;
+    private Timestamp calculationTime;
+    private WeatherCondition weatherCondition;
+    // temp
+    private Double maxTemperature;
+    private Double tempValue;
+    private Double minTemperature;
+    private Double feelsLike;
+    private String tempUnit;
 
-    public WeatherModel(WeatherType type, String key, String data) {
-        this.type = type;
-        this.key = key;
-        this.data = data;
-    }
+    // pressure
+    private double phValue;
+    private Double seaLevelValue;
+    private Double groundLevelValue;
+    private String phValueUnit;
+
+    private Integer humidity;
+    private String humidityUnit;
+
+    private WeatherLocation location;
+
+    private List<WeatherModel> weatherModelList;
 }

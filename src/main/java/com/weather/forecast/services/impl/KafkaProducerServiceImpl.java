@@ -4,7 +4,6 @@ import com.weather.forecast.services.KafkaProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -42,11 +41,11 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     }
 
     private void handleSuccess(String topic, SendResult<String, String> message) {
-        log.error("Message Failed to send with topic: {} and message: {}", topic, message);
+        log.info("Message sent successfully with topic: {} and message: {}", topic, message);
     }
 
     private void handleFailure(String topic, String message) {
-        log.info("Message sent successfully with topic: {} and message: {}", topic, message);
+        log.error("Message Failed to send with topic: {} and message: {}", topic, message);
     }
 
 }

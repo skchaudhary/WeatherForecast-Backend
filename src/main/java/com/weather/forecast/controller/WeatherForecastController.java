@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prominence.openweathermap.api.model.forecast.Forecast;
 import com.github.prominence.openweathermap.api.model.onecall.historical.HistoricalWeatherData;
 import com.github.prominence.openweathermap.api.model.weather.Weather;
-import com.weather.forecast.services.KafkaConsumerService;
-import com.weather.forecast.services.KafkaProducerService;
 import com.weather.forecast.services.WeatherForecastProcessService;
-import com.weather.forecast.utils.WeatherProcessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,10 +41,6 @@ public class WeatherForecastController {
      */
     @GetMapping("/current/{cityName}")
     public String currentWeather(@PathVariable String cityName) throws IOException {
-//        currentWeatherUrl = String.format(currentWeatherUrl, cityName);
-//        String data = WeatherProcessUtil.getWeatherResponse(currentWeatherUrl);
-//        kafkaProducerService.produce(data);
-
         Optional<Weather> currentForecastedData = weatherForecastProcessService.getCurrentWeatherForecast(cityName);
         if (currentForecastedData.isPresent()) {
             return objectMapper.writeValueAsString(currentForecastedData.get());
