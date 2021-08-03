@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @NoArgsConstructor
@@ -17,8 +17,8 @@ public class WeatherLocation {
     private int id;
     private String name;
     private String countryCode;
-    private Timestamp sunriseTime;
-    private Timestamp sunsetTime;
+    private Date sunriseTime;
+    private Date sunsetTime;
     private Coordinate coordinate;
 
     public int getId() {
@@ -45,19 +45,19 @@ public class WeatherLocation {
         this.countryCode = countryCode;
     }
 
-    public Timestamp getSunriseTime() {
+    public Date getSunriseTime() {
         return sunriseTime;
     }
 
-    public void setSunriseTime(Timestamp sunriseTime) {
+    public void setSunriseTime(Date sunriseTime) {
         this.sunriseTime = sunriseTime;
     }
 
-    public Timestamp getSunsetTime() {
+    public Date getSunsetTime() {
         return sunsetTime;
     }
 
-    public void setSunsetTime(Timestamp sunsetTime) {
+    public void setSunsetTime(Date sunsetTime) {
         this.sunsetTime = sunsetTime;
     }
 

@@ -1,9 +1,7 @@
 package com.weather.forecast.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.prominence.openweathermap.api.model.forecast.Forecast;
-import com.github.prominence.openweathermap.api.model.onecall.historical.HistoricalWeatherData;
-import com.github.prominence.openweathermap.api.model.weather.Weather;
+import com.weather.forecast.models.WeatherModel;
 import com.weather.forecast.services.WeatherForecastProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +39,7 @@ public class WeatherForecastController {
      */
     @GetMapping("/current/{cityName}")
     public String currentWeather(@PathVariable String cityName) throws IOException {
-        Optional<Weather> currentForecastedData = weatherForecastProcessService.getCurrentWeatherForecast(cityName);
+        Optional<WeatherModel> currentForecastedData = weatherForecastProcessService.getCurrentWeatherForecast(cityName);
         if (currentForecastedData.isPresent()) {
             return objectMapper.writeValueAsString(currentForecastedData.get());
         } else {
@@ -56,7 +54,7 @@ public class WeatherForecastController {
      */
     @GetMapping("/future/{cityName}")
     public String forecastFutureWeather(@PathVariable String cityName) throws IOException {
-        Optional<Forecast> currentForecastedData = weatherForecastProcessService.getFutureWeatherForecast(cityName);
+        Optional<WeatherModel> currentForecastedData = weatherForecastProcessService.getFutureWeatherForecast(cityName);
         if (currentForecastedData.isPresent()) {
             return objectMapper.writeValueAsString(currentForecastedData.get());
         } else {
@@ -71,7 +69,7 @@ public class WeatherForecastController {
      */
     @GetMapping("/past/{latitude}/{longitude}")
     public String forecastPastWeather(@PathVariable Double latitude, @PathVariable Double longitude) throws IOException {
-        Optional<HistoricalWeatherData> currentForecastedData = weatherForecastProcessService.getPastWeatherForecast(latitude, longitude);
+        Optional<WeatherModel> currentForecastedData = weatherForecastProcessService.getPastWeatherForecast(latitude, longitude);
         if (currentForecastedData.isPresent()) {
             return objectMapper.writeValueAsString(currentForecastedData.get());
         } else {

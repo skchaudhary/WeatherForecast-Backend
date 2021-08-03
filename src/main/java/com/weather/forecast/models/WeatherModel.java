@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Document(collection = "weather")
@@ -22,7 +22,7 @@ public class WeatherModel {
     private String id;
     private String key;
     private WeatherType type;
-    private Timestamp calculationTime;
+    private Date calculationTime;
     private WeatherCondition weatherCondition;
     // temp
     private Double maxTemperature;

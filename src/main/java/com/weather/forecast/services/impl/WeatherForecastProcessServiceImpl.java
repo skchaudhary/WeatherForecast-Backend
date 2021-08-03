@@ -17,6 +17,7 @@ import com.github.prominence.openweathermap.api.model.weather.Weather;
 import com.weather.forecast.models.WeatherLocation;
 import com.weather.forecast.models.WeatherModel;
 import com.weather.forecast.models.WeatherType;
+import com.weather.forecast.repository.WeatherRepository;
 import com.weather.forecast.services.KafkaProducerService;
 import com.weather.forecast.services.WeatherForecastProcessService;
 import com.weather.forecast.utils.DateUtil;
@@ -56,10 +57,13 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private WeatherRepository weatherRepository;
+
     OpenWeatherMapClient openWeatherClient;
 
     @Override
-    public Optional<Weather> getCurrentWeatherForecast(String city) {
+    public Optional<WeatherModel> getCurrentWeatherForecast(String city) {
         openWeatherClient = new OpenWeatherMapClient(apiKey);
         CompletableFuture<Weather> completableFuture = openWeatherClient.currentWeather()
                 .single()
@@ -67,12 +71,19 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
                 .language(Language.ENGLISH)
                 .retrieveAsync()
                 .asJava();
-        Optional<Weather> weatherData = Optional.empty();
+        Optional<WeatherModel> weatherData = Optional.empty();
         try {
             Weather weather = completableFuture.get();
             WeatherModel weatherModel = getPopulatedWeatherData(weather);
             kafkaProducerService.produce(objectMapper.writeValueAsString(weatherModel), currentDataTopic);
-            return Optional.of(weather);
+
+            Thread.sleep(2000);
+            // fetch data from database
+            List<WeatherModel> weatherModelList = weatherRepository.findByKey(weatherModel.getKey());
+
+            if (weatherModelList != null && weatherModelList.size()>0) {
+                weatherData = Optional.of(weatherModelList.get(0));
+            }
         } catch (InterruptedException e) {
             log.error("Error during getting the current weather forecasted data with error: {}", e.getMessage());
         } catch (ExecutionException e) {
@@ -80,7 +91,6 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
         } catch (JsonProcessingException e) {
             log.error("Error during parsing the weather data: {}", e.getMessage());
         }
-
 
         return weatherData;
     }
@@ -109,7 +119,7 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
         weatherModel.setLocation(location);
         weatherModel.setCalculationTime(Timestamp.valueOf(weather.getCalculationTime()));
 
-        String key = location.getCoordinate() + DateUtil.format(DateUtil.YMD_FORMAT, weatherModel.getCalculationTime());
+        String key = location.getCoordinate() + DateUtil.format(DateUtil.YMD_FORMAT, weatherModel.getCalculationTime()) + WeatherType.CURRENT.name();
         weatherModel.setKey(key);
         weatherModel.setType(WeatherType.CURRENT);
 
@@ -127,7 +137,7 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
     }
 
     @Override
-    public Optional<HistoricalWeatherData> getPastWeatherForecast(Double latitude, Double longitude) {
+    public Optional<WeatherModel> getPastWeatherForecast(Double latitude, Double longitude) {
         openWeatherClient = new OpenWeatherMapClient(apiKey);
         CompletableFuture<HistoricalWeatherData> completableFuture = openWeatherClient.oneCall()
                 .historical()
@@ -135,12 +145,19 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
                 .language(Language.ENGLISH)
                 .retrieveAsync()
                 .asJava();
-        Optional<HistoricalWeatherData> historicalWeatherData = Optional.empty();
+        Optional<WeatherModel> historicalWeatherData = Optional.empty();
         try {
             HistoricalWeatherData weatherData = completableFuture.get();
             WeatherModel weatherModel = getPopulatedWeatherData(weatherData);
             kafkaProducerService.produce(objectMapper.writeValueAsString(weatherModel), pastDataTopic);
-            return Optional.of(weatherData);
+
+            Thread.sleep(2000);
+            // fetch data from database
+            List<WeatherModel> weatherModelList = weatherRepository.findByKey(weatherModel.getKey());
+
+            if (weatherModelList != null && weatherModelList.size()>0) {
+                historicalWeatherData = Optional.of(weatherModelList.get(0));
+            }
         } catch (InterruptedException e) {
             log.error("Error during getting the current weather forecasted data with error: {}", e.getMessage());
         } catch (ExecutionException e) {
@@ -187,7 +204,7 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
         }
         weatherModel.setWeatherModelList(weatherModelList);
 
-        String key = weather.getCoordinate() + DateUtil.format(DateUtil.YMD_FORMAT, weatherModel.getCalculationTime());
+        String key = weather.getCoordinate() + DateUtil.format(DateUtil.YMD_FORMAT, weatherModel.getCalculationTime()) + WeatherType.CURRENT.name();
         weatherModel.setKey(key);
         weatherModel.setType(WeatherType.PAST);
 
@@ -201,7 +218,7 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
     }
 
     @Override
-    public Optional<Forecast> getFutureWeatherForecast(String city) {
+    public Optional<WeatherModel> getFutureWeatherForecast(String city) {
         openWeatherClient = new OpenWeatherMapClient(apiKey);
         Forecast forecast = openWeatherClient.forecast5Day3HourStep()
                 .byCityName(city)
@@ -209,14 +226,23 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
                 .language(Language.ENGLISH)
                 .retrieve()
                 .asJava();
-        Optional<Forecast> futureForecastedData = Optional.empty();
+        Optional<WeatherModel> futureForecastedData = Optional.empty();
         if (forecast != null) {
             try {
                 WeatherModel weatherModel = getPopulatedWeatherData(forecast);
                 kafkaProducerService.produce(objectMapper.writeValueAsString(weatherModel), futureDataTopic);
-                return Optional.of(forecast);
+
+                Thread.sleep(2000);
+                // fetch data from database
+                List<WeatherModel> weatherModelList = weatherRepository.findByKey(weatherModel.getKey());
+
+                if (weatherModelList != null && weatherModelList.size()>0) {
+                    futureForecastedData = Optional.of(weatherModelList.get(0));
+                }
             } catch (JsonProcessingException e) {
                 log.error("Error during parsing the weather data: {}", e.getMessage());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
         return futureForecastedData;
@@ -229,7 +255,7 @@ public class WeatherForecastProcessServiceImpl implements WeatherForecastProcess
 
         weatherModel.setCalculationTime(Timestamp.valueOf(LocalDateTime.now()));
 
-        String key = location.getCoordinate() + DateUtil.format(DateUtil.YMD_FORMAT, weatherModel.getCalculationTime());
+        String key = location.getCoordinate() + DateUtil.format(DateUtil.YMD_FORMAT, weatherModel.getCalculationTime()) + WeatherType.CURRENT.name();
         weatherModel.setKey(key);
         weatherModel.setType(WeatherType.FUTURE);
 
