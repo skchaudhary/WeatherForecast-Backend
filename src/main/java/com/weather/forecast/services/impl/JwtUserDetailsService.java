@@ -11,17 +11,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service("customUserService")
-public class CustomUserDetailService implements UserDetailsService {
+@Service
+public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        final Optional<Customer> customers = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        final Optional<Customer> customers = userRepository.findByEmail(username);
         if (!customers.isPresent()) {
-            throw new UsernameNotFoundException("" + email);
+            throw new UsernameNotFoundException("" + username);
         }
         Customer customer = customers.get();
         UserDetails user = User.withUsername(customer.getEmail()).password(customer.getPassword()).authorities("USER").build();
